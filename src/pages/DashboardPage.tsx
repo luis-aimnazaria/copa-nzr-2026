@@ -4,9 +4,8 @@ import { MatchCard } from '../components/MatchCard'
 import type { ScoreDraft } from '../components/MatchCard'
 import { ScoringRulesButton } from '../components/ScoringRules'
 import { db } from '../services/storage'
-import { useNow } from '../hooks/useNow'
 import { calculateMatchPoints, calculateUserScore } from '../utils/scoring'
-import { groupMatchesBySection, hasStarted } from '../utils/matches'
+import { groupMatchesBySection } from '../utils/matches'
 
 interface DashboardPageProps {
   user: User
@@ -36,8 +35,6 @@ export function DashboardPage({ user, matches, onUserUpdate }: DashboardPageProp
 
   const sections = useMemo(() => groupMatchesBySection(matches), [matches])
   const score = useMemo(() => calculateUserScore(user, matches), [user, matches])
-  // Tique de 1 min: trava os palpites no horário do pontapé inicial
-  const now = useNow()
 
   const filledCount = Object.values(drafts).filter((d) => d.home !== '' && d.away !== '').length
 
@@ -97,7 +94,7 @@ export function DashboardPage({ user, matches, onUserUpdate }: DashboardPageProp
                   match={match}
                   draft={drafts[match.id] ?? { home: '', away: '' }}
                   onChange={updateDraft(match.id)}
-                  locked={match.realScore !== null || hasStarted(match, now)}
+                  locked={match.realScore !== null}
                   badge={
                     points !== null && (
                       <span
