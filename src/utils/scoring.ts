@@ -80,6 +80,7 @@ export function buildRanking(users: User[], matches: Match[]): RankingEntry[] {
       return {
         email: user.email,
         name: user.name,
+        company: user.company,
         totalPoints: score.totalPoints,
         exactScores: score.exactScores,
         predictionsCount: Object.keys(user.predictions).length,

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { Match, RankingEntry } from '../types'
+import { COMPANY_LABELS } from '../types'
 import { ScoringRulesButton } from '../components/ScoringRules'
 import { db } from '../services/storage'
 import { buildRanking } from '../utils/scoring'
@@ -61,6 +62,9 @@ export function RankingPage({ matches, currentEmail }: RankingPageProps) {
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-bold text-white">
                     {entry.name}
+                    <span className="ml-2 rounded bg-navy-700/60 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-navy-200 uppercase">
+                      {COMPANY_LABELS[entry.company] ?? entry.company}
+                    </span>
                     {isMe && <span className="ml-2 text-xs font-semibold text-brand-400">(você)</span>}
                   </p>
                   <p className="text-xs text-navy-300">

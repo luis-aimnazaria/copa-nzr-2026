@@ -1,4 +1,5 @@
 import type { User } from '../types'
+import { COMPANY_LABELS } from '../types'
 
 export type Tab = 'palpites' | 'ranking' | 'apuracao'
 
@@ -32,7 +33,9 @@ export function Header({ user, activeTab, onTabChange, onLogout }: HeaderProps) 
         <div className="flex items-center gap-3 text-right">
           <div className="hidden sm:block">
             <p className="text-sm font-semibold text-white">{user.name}</p>
-            <p className="text-xs text-navy-300">{user.email}</p>
+            <p className="text-xs text-navy-300">
+              {user.email} · {COMPANY_LABELS[user.company] ?? user.company}
+            </p>
           </div>
           <button
             onClick={onLogout}

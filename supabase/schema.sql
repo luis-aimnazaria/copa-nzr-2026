@@ -7,6 +7,10 @@
 create table if not exists public.users (
   email text primary key,
   name text not null,
+  company text not null check (company in (
+    'FORTALEZA','TIMON','NATAL','CAMPINA','FEIRA',
+    'RECIFE','MACEIO','CASTANHAL','TERESINA','IMPERATRIZ'
+  )),
   predictions jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()

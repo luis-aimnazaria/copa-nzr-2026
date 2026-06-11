@@ -1,12 +1,13 @@
 import { createClient } from '@supabase/supabase-js'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Score, User } from '../../types'
+import type { Company, Score, User } from '../../types'
 import type { StorageAdapter } from './StorageAdapter'
 
 /** Linha da tabela public.users (ver supabase/schema.sql). */
 interface UserRow {
   email: string
   name: string
+  company: Company
   predictions: Record<string, Score>
   created_at: string
   updated_at: string
@@ -22,6 +23,7 @@ interface ResultRow {
 const rowToUser = (row: UserRow): User => ({
   email: row.email,
   name: row.name,
+  company: row.company,
   predictions: row.predictions ?? {},
   createdAt: row.created_at,
   updatedAt: row.updated_at,
@@ -53,6 +55,7 @@ export class SupabaseAdapter implements StorageAdapter {
     const { error } = await this.client.from('users').upsert({
       email: user.email,
       name: user.name,
+      company: user.company,
       predictions: user.predictions,
       created_at: user.createdAt,
       updated_at: new Date().toISOString(),

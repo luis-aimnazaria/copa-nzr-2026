@@ -59,10 +59,42 @@ export interface Match {
   realScore: Score | null
 }
 
+/** Unidades da Nazária — valores canônicos gravados no banco. */
+export const COMPANIES = [
+  'FORTALEZA',
+  'TIMON',
+  'NATAL',
+  'CAMPINA',
+  'FEIRA',
+  'RECIFE',
+  'MACEIO',
+  'CASTANHAL',
+  'TERESINA',
+  'IMPERATRIZ',
+] as const
+
+export type Company = (typeof COMPANIES)[number]
+
+/** Nomes de exibição das unidades. */
+export const COMPANY_LABELS: Record<Company, string> = {
+  FORTALEZA: 'Fortaleza',
+  TIMON: 'Timon',
+  NATAL: 'Natal',
+  CAMPINA: 'Campina',
+  FEIRA: 'Feira',
+  RECIFE: 'Recife',
+  MACEIO: 'Maceió',
+  CASTANHAL: 'Castanhal',
+  TERESINA: 'Teresina',
+  IMPERATRIZ: 'Imperatriz',
+}
+
 export interface User {
   /** E-mail normalizado (minúsculas) — identificador único do usuário. */
   email: string
   name: string
+  /** Empresa/unidade do participante. */
+  company: Company
   /** Palpites indexados por id do jogo. */
   predictions: Record<string, Score>
   createdAt: string
@@ -73,6 +105,7 @@ export interface User {
 export interface RankingEntry {
   email: string
   name: string
+  company: Company
   totalPoints: number
   exactScores: number
   predictionsCount: number

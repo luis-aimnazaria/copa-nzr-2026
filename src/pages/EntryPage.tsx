@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import type { User } from '../types'
+import type { Company, User } from '../types'
+import { COMPANIES, COMPANY_LABELS } from '../types'
 import { db } from '../services/storage'
 import { isValidEmail, normalizeEmail } from '../utils/email'
 
@@ -16,6 +17,7 @@ interface EntryPageProps {
 export function EntryPage({ onLogin }: EntryPageProps) {
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
+  const [company, setCompany] = useState<Company | ''>('')
   const [isNewUser, setIsNewUser] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -50,10 +52,16 @@ export function EntryPage({ onLogin }: EntryPageProps) {
         return
       }
 
+      if (!company) {
+        setError('Selecione a sua empresa/unidade.')
+        return
+      }
+
       const now = new Date().toISOString()
       const user: User = {
         email: normalized,
         name: name.trim(),
+        company,
         predictions: {},
         createdAt: now,
         updatedAt: now,
@@ -124,6 +132,25 @@ export function EntryPage({ onLogin }: EntryPageProps) {
                 onChange={(e) => setName(e.target.value)}
                 className="w-full rounded-xl border border-navy-600 bg-navy-950 px-4 py-3 text-white placeholder:text-navy-500 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30 focus:outline-none"
               />
+
+              <label htmlFor="company" className="mt-4 mb-1.5 block text-sm font-semibold text-navy-100">
+                Empresa
+              </label>
+              <select
+                id="company"
+                value={company}
+                onChange={(e) => setCompany(e.target.value as Company | '')}
+                className="w-full appearance-none rounded-xl border border-navy-600 bg-navy-950 px-4 py-3 text-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30 focus:outline-none"
+              >
+                <option value="" disabled>
+                  Selecione sua unidade
+                </option>
+                {COMPANIES.map((c) => (
+                  <option key={c} value={c}>
+                    {COMPANY_LABELS[c]}
+                  </option>
+                ))}
+              </select>
             </div>
           )}
 
