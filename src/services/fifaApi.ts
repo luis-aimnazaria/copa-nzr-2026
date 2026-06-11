@@ -7,13 +7,13 @@ import teamsSnapshot from '../data/teams.snapshot.json'
  * hospedada em worldcup26.ir): 104 jogos, 48 seleções, placares ao vivo.
  *
  * Estratégia de resiliência:
- *  1. Tenta a API ao vivo via proxy `/wc-api` (configurado no vite.config.ts).
- *  2. Se falhar (offline, CORS, API fora do ar), usa o snapshot local
- *     em `src/data/*.snapshot.json` — o app nunca fica sem calendário.
+ *  1. Tenta a API via /api/games e /api/teams — em produção são funções
+ *     serverless com cache na CDN (api/*.js); em dev, proxy do Vite.
+ *  2. Se falhar, usa a última resposta boa guardada no navegador.
+ *  3. Último recurso: snapshot local em `src/data/*.snapshot.json`.
  */
 
-const API_BASE = '/wc-api'
-const REQUEST_TIMEOUT_MS = 8000
+const REQUEST_TIMEOUT_MS = 12000
 
 /* ---------- Formato bruto da API ---------- */
 
@@ -183,7 +183,7 @@ async function fetchJson<T>(path: string): Promise<T> {
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
   try {
-    const response = await fetch(`${API_BASE}${path}`, { signal: controller.signal })
+    const response = await fetch(path, { signal: controller.signal })
     if (!response.ok) throw new Error(`API respondeu ${response.status}`)
     return (await response.json()) as T
   } finally {
@@ -222,8 +222,8 @@ function writeCache(games: ApiGame[], teams: ApiTeam[]): void {
 
 async function fetchFromApi(): Promise<{ games: ApiGame[]; teams: ApiTeam[] }> {
   const [gamesRes, teamsRes] = await Promise.all([
-    fetchJson<{ games: ApiGame[] }>('/get/games'),
-    fetchJson<{ teams: ApiTeam[] }>('/get/teams'),
+    fetchJson<{ games: ApiGame[] }>('/api/games'),
+    fetchJson<{ teams: ApiTeam[] }>('/api/teams'),
   ])
   return { games: gamesRes.games, teams: teamsRes.teams }
 }

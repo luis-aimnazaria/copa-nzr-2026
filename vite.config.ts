@@ -3,15 +3,20 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
 /**
- * O proxy /wc-api contorna o CORS da API worldcup26.ir durante o
- * desenvolvimento. Em produção, configure um proxy equivalente no servidor —
- * sem ele, o app cai automaticamente no snapshot local dos dados.
+ * Proxies de desenvolvimento espelhando as rotas de produção:
+ * em produção, /api/games e /api/teams são funções serverless da Vercel
+ * (pasta api/) com cache na CDN; em dev, vão direto na API da Copa.
  */
 const worldCupProxy = {
-  '/wc-api': {
+  '/api/games': {
     target: 'https://worldcup26.ir',
     changeOrigin: true,
-    rewrite: (path: string) => path.replace(/^\/wc-api/, ''),
+    rewrite: () => '/get/games',
+  },
+  '/api/teams': {
+    target: 'https://worldcup26.ir',
+    changeOrigin: true,
+    rewrite: () => '/get/teams',
   },
 }
 
