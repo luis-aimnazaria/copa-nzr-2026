@@ -10,7 +10,9 @@ import type { StorageAdapter } from './StorageAdapter'
  *  - Sem as variáveis → LocalStorage (modo demonstração, dados só no navegador).
  */
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+// Aceita tanto o formato novo (sb_publishable_...) quanto o legado (anon JWT)
+const supabaseKey =
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? import.meta.env.VITE_SUPABASE_ANON_KEY
 
 export const db: StorageAdapter =
   supabaseUrl && supabaseKey

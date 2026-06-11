@@ -33,3 +33,9 @@ create policy "results_select" on public.results for select using (true);
 create policy "results_insert" on public.results for insert with check (true);
 create policy "results_update" on public.results for update using (true);
 create policy "results_delete" on public.results for delete using (true);
+
+-- Projetos novos do Supabase exigem GRANT explícito para o papel anon
+-- (as políticas de RLS acima só valem depois desta permissão de base).
+grant usage on schema public to anon, authenticated;
+grant select, insert, update on public.users to anon, authenticated;
+grant select, insert, update, delete on public.results to anon, authenticated;
