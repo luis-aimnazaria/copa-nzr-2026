@@ -6,7 +6,7 @@ import { ScoringRulesButton } from '../components/ScoringRules'
 import { db } from '../services/storage'
 import { useNow } from '../hooks/useNow'
 import { calculateMatchPoints, calculateUserScore } from '../utils/scoring'
-import { groupMatchesBySection, hasStarted } from '../utils/matches'
+import { groupMatchesBySection, hasStarted, isPredictionLocked } from '../utils/matches'
 
 interface DashboardPageProps {
   user: User
@@ -91,15 +91,23 @@ export function DashboardPage({ user, matches, onUserUpdate }: DashboardPageProp
               const saved = user.predictions[match.id]
               const points =
                 match.realScore && saved ? calculateMatchPoints(saved, match.realScore) : null
+              const locked = match.realScore !== null || isPredictionLocked(match, now)
+              // exceção de prazo ativa: jogo rolando, mas palpite ainda aberto
+              const extendedWindow = !locked && hasStarted(match, now)
               return (
                 <MatchCard
                   key={match.id}
                   match={match}
                   draft={drafts[match.id] ?? { home: '', away: '' }}
                   onChange={updateDraft(match.id)}
-                  locked={match.realScore !== null || hasStarted(match, now)}
+                  locked={locked}
                   badge={
-                    points !== null && (
+                    extendedWindow ? (
+                      <span className="rounded-full bg-brand-500/15 px-2.5 py-0.5 text-xs font-bold text-brand-300">
+                        ⏱ Palpites liberados até o fim do 1º tempo
+                      </span>
+                    ) : (
+                      points !== null && (
                       <span
                         className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
                           points > 0
@@ -109,6 +117,7 @@ export function DashboardPage({ user, matches, onUserUpdate }: DashboardPageProp
                       >
                         {points > 0 ? `+${points} pts` : '0 pts'}
                       </span>
+                      )
                     )
                   }
                 />

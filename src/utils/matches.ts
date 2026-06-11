@@ -55,3 +55,20 @@ export const hasDefinedTeams = (match: Match) =>
 /** O jogo já começou? (palpites fecham no horário do pontapé inicial) */
 export const hasStarted = (match: Match, now: Date = new Date()) =>
   new Date(match.date).getTime() <= now.getTime()
+
+/**
+ * Exceções pontuais de prazo de palpite (id do jogo → deadline em UTC).
+ * Jogo 1 (abertura): liberado até o fim do 1º tempo, pois o link do bolão
+ * só foi divulgado depois do pontapé inicial (16:50 de Brasília = 19:50 UTC).
+ */
+export const PREDICTION_DEADLINE_OVERRIDES: Record<string, string> = {
+  '1': '2026-06-11T19:50:00Z',
+}
+
+/** Prazo final de palpite do jogo (pontapé inicial, salvo exceção acima). */
+export const predictionDeadline = (match: Match): string =>
+  PREDICTION_DEADLINE_OVERRIDES[match.id] ?? match.date
+
+/** Palpite fechado? (prazo vencido — independe de já ter resultado) */
+export const isPredictionLocked = (match: Match, now: Date = new Date()) =>
+  new Date(predictionDeadline(match)).getTime() <= now.getTime()
