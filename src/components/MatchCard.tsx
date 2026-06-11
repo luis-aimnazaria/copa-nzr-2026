@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import type { Match, Team } from '../types'
-import { formatMatchDate, hasDefinedTeams } from '../utils/matches'
+import { formatMatchDate, hasDefinedTeams, hasStarted } from '../utils/matches'
 
 export interface ScoreDraft {
   home: string
@@ -34,10 +34,16 @@ export function MatchCard({ match, draft, onChange, locked = false, badge }: Mat
     <div className="rounded-xl border border-navy-700/60 bg-navy-800/50 p-3 transition-colors hover:border-navy-500">
       <p className="mb-2 text-center text-xs font-medium text-navy-300 capitalize">
         {formatMatchDate(match.date)}
-        {match.realScore && (
+        {match.realScore ? (
           <span className="ml-2 rounded bg-brand-500/15 px-1.5 py-0.5 font-semibold text-brand-300 uppercase">
             Encerrado {match.realScore.home} x {match.realScore.away}
           </span>
+        ) : (
+          hasStarted(match) && (
+            <span className="ml-2 animate-pulse rounded bg-red-500/15 px-1.5 py-0.5 font-semibold text-red-300 uppercase">
+              ● Em andamento
+            </span>
+          )
         )}
       </p>
 

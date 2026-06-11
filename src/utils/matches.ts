@@ -51,3 +51,7 @@ export const formatMatchDate = (iso: string) => dateFormatter.format(new Date(is
 /** Jogo só aceita palpite/apuração quando os dois times já estão definidos. */
 export const hasDefinedTeams = (match: Match) =>
   match.homeTeam.code !== 'TBD' && match.awayTeam.code !== 'TBD'
+
+/** O jogo já começou? (palpites fecham no horário do pontapé inicial) */
+export const hasStarted = (match: Match, now: Date = new Date()) =>
+  new Date(match.date).getTime() <= now.getTime()
