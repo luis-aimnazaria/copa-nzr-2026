@@ -32,6 +32,7 @@ export function DashboardPage({ user, matches, onUserUpdate }: DashboardPageProp
   const [dirty, setDirty] = useState(false)
   const [saving, setSaving] = useState(false)
   const [savedFeedback, setSavedFeedback] = useState(false)
+  const [saveError, setSaveError] = useState(false)
 
   const sections = useMemo(() => groupMatchesBySection(matches), [matches])
   const score = useMemo(() => calculateUserScore(user, matches), [user, matches])
@@ -47,6 +48,7 @@ export function DashboardPage({ user, matches, onUserUpdate }: DashboardPageProp
 
   const handleSave = async () => {
     setSaving(true)
+    setSaveError(false)
     try {
       const predictions: Record<string, Score> = {}
       for (const [matchId, draft] of Object.entries(drafts)) {
@@ -60,6 +62,9 @@ export function DashboardPage({ user, matches, onUserUpdate }: DashboardPageProp
       setDirty(false)
       setSavedFeedback(true)
       setTimeout(() => setSavedFeedback(false), 3000)
+    } catch (err) {
+      console.error('[DashboardPage] erro ao salvar palpites', err)
+      setSaveError(true)
     } finally {
       setSaving(false)
     }
@@ -138,6 +143,10 @@ export function DashboardPage({ user, matches, onUserUpdate }: DashboardPageProp
           <p className="text-xs text-navy-300">
             {savedFeedback ? (
               <span className="font-semibold text-brand-300">✓ Palpites salvos!</span>
+            ) : saveError ? (
+              <span className="font-semibold text-red-400">
+                Não foi possível salvar — tente novamente.
+              </span>
             ) : (
               <>
                 <span className="font-bold text-white">{filledCount}</span> palpite(s) preenchido(s)
