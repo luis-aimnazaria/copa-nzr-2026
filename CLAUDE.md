@@ -49,7 +49,7 @@ Duas fontes convergem em `matchService.getMatches()`, a única fonte de jogos da
 
 ## Convenções e decisões do dono
 
-- Palpites ficam abertos **até o fim do jogo** (trava só na apuração) — decisão deliberada do organizador; não "corrigir" para travar no kickoff.
+- Palpites travam **no pontapé inicial** (`hasStarted` + tick de 1 min do `useNow` no Dashboard). Atenção: essa trava é client-side; o trigger do banco só bloqueia jogos já apurados (`results`) — entre o kickoff e a apuração, a trava depende da UI.
 - Identidade visual Nazária: tokens em `src/index.css` (`--color-brand-500: #FF7415` laranja, escala navy sobre `#000B44`, fonte DM Sans servida de `public/fonts/`). Use as classes `brand-*`/`navy-*`, não cores Tailwind genéricas. Parciais/ao-vivo usam vermelho pulsante; definitivos, laranja.
 - E-mail aparece mascarado no ranking (`lu***@***.com.br`, `utils/email.ts`); completo só para o próprio usuário no header.
 - `IDENTIDADE_NZR/` contém o manual interno da marca — o repo GitHub é privado; não tornar público sem remover essa pasta.
