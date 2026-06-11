@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(npm install *)",
+      "PowerShell(npm run *)",
+      "PowerShell(node --experimental-strip-types -e \"import\\('./src/utils/scoring.ts'\\).then\\(\\({calculateMatchPoints}\\) => { const t = \\(p, r, exp\\) => { const got = calculateMatchPoints\\(p, r\\); console.log\\(\\(got === exp ? 'PASS' : 'FAIL'\\), JSON.stringify\\(p\\), 'vs', JSON.stringify\\(r\\), '=>', got, '\\(esperado', exp + '\\)'\\); }; t\\({home:2,away:1},{home:2,away:1},25\\); t\\({home:3,away:1},{home:2,away:0},18\\); t\\({home:2,away:1},{home:2,away:0},15\\); t\\({home:1,away:0},{home:3,away:1},10\\); t\\({home:0,away:2},{home:3,away:1},0\\); t\\({home:1,away:1},{home:2,away:2},18\\); t\\({home:2,away:2},{home:2,away:2},25\\); }\\)\" 2>&1)",
+      "PowerShell(git clone --depth 1 https://github.com/rezarahiminia/worldcup2026.git \"$env:TEMP\\\\worldcup2026\")",
+      "PowerShell(Add-Type -AssemblyName System.Drawing; $img = [System.Drawing.Bitmap]::FromFile\\('C:\\\\Users\\\\luis.sobrinho\\\\Documents\\\\PROJETOS\\\\bolao-copa\\\\IDENTIDADE_NZR\\\\LOGO NAZÁRIA DISTRIBUIDORA.PNG\\\\Horizontal\\\\Nazaria_RGB_Horizontal.png'\\); $star = $img.GetPixel\\(1200, 1000\\); $text = $img.GetPixel\\(3000, 1200\\); \"STAR: R=$\\($star.R\\) G=$\\($star.G\\) B=$\\($star.B\\) A=$\\($star.A\\)\"; \"TEXT: R=$\\($text.R\\) G=$\\($text.G\\) B=$\\($text.B\\) A=$\\($text.A\\)\"; $img.Dispose\\(\\))",
+      "PowerShell(Add-Type -AssemblyName System.Drawing; $img = [System.Drawing.Bitmap]::FromFile\\('C:\\\\Users\\\\luis.sobrinho\\\\Documents\\\\PROJETOS\\\\bolao-copa\\\\IDENTIDADE_NZR\\\\LOGO NAZÁRIA DISTRIBUIDORA.PNG\\\\Icone\\\\Nazaria_RGB_Icone.png'\\); \"Tamanho: $\\($img.Width\\)x$\\($img.Height\\)\"; foreach \\($p in @\\(@\\(3590,800\\), @\\(3590,1500\\), @\\(1500,2000\\), @\\(2500,3500\\)\\)\\) { $c = $img.GetPixel\\($p[0], $p[1]\\); \"\\($\\($p[0]\\),$\\($p[1]\\)\\): R=$\\($c.R\\) G=$\\($c.G\\) B=$\\($c.B\\) A=$\\($c.A\\)\" }; $img.Dispose\\(\\))",
+      "PowerShell(Get-Content *)",
+      "PowerShell(Add-Type -AssemblyName System.Drawing; $img = [System.Drawing.Bitmap]::FromFile\\('C:\\\\Users\\\\luis.sobrinho\\\\Documents\\\\PROJETOS\\\\bolao-copa\\\\IDENTIDADE_NZR\\\\LOGO NAZÁRIA DISTRIBUIDORA.PNG\\\\Icone\\\\Nazaria_RGB_Icone.png'\\); foreach \\($p in @\\(@\\(1400,800\\), @\\(2100,800\\), @\\(600,1800\\), @\\(2900,1800\\), @\\(1758,2900\\)\\)\\) { $c = $img.GetPixel\\($p[0], $p[1]\\); if \\($c.A -gt 0\\) { \"\\($\\($p[0]\\),$\\($p[1]\\)\\): R=$\\($c.R\\) G=$\\($c.G\\) B=$\\($c.B\\) A=$\\($c.A\\)\" } }; $img.Dispose\\(\\))",
+      "PowerShell($m = Get-Content \"$env:TEMP\\\\worldcup2026\\\\football.matches.json\" -Raw | ConvertFrom-Json; \"TOTAL: $\\($m.Count\\)\"; $m[0] | ConvertTo-Json -Depth 5; $m[80] | ConvertTo-Json -Depth 5; $m[103] | ConvertTo-Json -Depth 5)",
+      "PowerShell(ConvertTo-Json *)",
+      "PowerShell(Expand-Archive *)",
+      "PowerShell(try { $r = Invoke-WebRequest -Uri 'https://worldcup26.ir/get/games' -Headers @{Origin='http://localhost:5173'} -TimeoutSec 20; \"STATUS: $\\($r.StatusCode\\)\"; \"ACAO: $\\($r.Headers['Access-Control-Allow-Origin']\\)\"; $json = $r.Content | ConvertFrom-Json; $json.PSObject.Properties.Name; $json.games[0] | ConvertTo-Json } catch { \"ERRO: $\\($_.Exception.Message\\)\" })",
+      "PowerShell($t = Get-Content \"$env:TEMP\\\\worldcup2026\\\\football.teams.json\" -Raw | ConvertFrom-Json; $t | ForEach-Object { \"$\\($_.id\\)|$\\($_.fifa_code\\)|$\\($_.iso2\\)|$\\($_.name_en\\)|$\\($_.groups\\)\" }; '---LABELS---'; $m = Get-Content \"$env:TEMP\\\\worldcup2026\\\\football.matches.json\" -Raw | ConvertFrom-Json; $m | Where-Object home_team_label | ForEach-Object { $_.home_team_label; $_.away_team_label } | Sort-Object -Unique)",
+      "PowerShell(New-Item *)",
+      "PowerShell(Start-Sleep -Seconds 3; try { $r = Invoke-WebRequest -Uri 'http://localhost:5173/wc-api/get/games' -TimeoutSec 25; $json = $r.Content | ConvertFrom-Json; \"PROXY OK: $\\($json.games.Count\\) jogos\"; $finished = $json.games | Where-Object { $_.finished -eq 'TRUE' }; \"Jogos encerrados na API: $\\($finished.Count\\)\" } catch { \"ERRO PROXY: $\\($_.Exception.Message\\)\" }; try { $p = Invoke-WebRequest -Uri 'http://localhost:5173/' -TimeoutSec 10; \"APP OK: status $\\($p.StatusCode\\)\" } catch { \"ERRO APP: $\\($_.Exception.Message\\)\" })",
+      "PowerShell(Remove-Item *)"
+    ]
+  }
+}

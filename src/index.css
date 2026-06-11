@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+/* Fonte oficial da marca Nazária (variável: cobre todos os pesos) */
+@font-face {
+  font-family: 'DM Sans';
+  src: url('/fonts/DMSans-Variable.ttf') format('truetype-variations');
+  font-weight: 100 1000;
+  font-style: normal;
+  font-display: swap;
+}
+
+/*
+ * Identidade visual Nazária Distribuidora:
+ *  - Laranja institucional #FF7415 (estrela)
+ *  - Azul-marinho institucional #000B44 (wordmark)
+ *  - Tipografia DM Sans
+ */
+@theme {
+  --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+
+  /* Laranja Nazária e variações */
+  --color-brand-200: #FFD0AC;
+  --color-brand-300: #FFAE70;
+  --color-brand-400: #FF8E3E;
+  --color-brand-500: #FF7415;
+  --color-brand-600: #E05F02;
+
+  /* Escala de azul construída sobre o navy institucional #000B44 */
+  --color-navy-950: #010516;
+  --color-navy-900: #02082B;
+  --color-navy-850: #000B44;
+  --color-navy-800: #0A1650;
+  --color-navy-700: #15246B;
+  --color-navy-600: #243786;
+  --color-navy-500: #3B50A4;
+  --color-navy-400: #7286C9;
+  --color-navy-300: #A4B2DF;
+  --color-navy-200: #CBD4EF;
+  --color-navy-100: #E7EBF9;
+}
+
+/* Esconde os spinners dos inputs numéricos de placar */
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
