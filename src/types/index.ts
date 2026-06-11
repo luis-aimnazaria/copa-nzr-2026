@@ -57,6 +57,8 @@ export interface Match {
   awayTeam: Team
   /** Resultado real — null enquanto o jogo não foi apurado. */
   realScore: Score | null
+  /** Placar parcial de jogo em andamento (apuração provisória) — null fora disso. */
+  liveScore: Score | null
 }
 
 /** Unidades da Nazária — valores canônicos gravados no banco. */
@@ -106,7 +108,10 @@ export interface RankingEntry {
   email: string
   name: string
   company: Company
+  /** Pontos definitivos (jogos encerrados). */
   totalPoints: number
+  /** Pontos provisórios de jogos em andamento (flutuam com o placar). */
+  livePoints: number
   exactScores: number
   predictionsCount: number
 }

@@ -39,6 +39,13 @@ export function RankingPage({ matches, currentEmail }: RankingPageProps) {
         <ScoringRulesButton />
       </div>
 
+      {ranking.some((e) => e.livePoints > 0) && (
+        <p className="mb-3 rounded-lg bg-red-500/10 px-3 py-2 text-xs text-red-200">
+          ● Há jogos em andamento: os pontos <strong>parciais</strong> entram na ordem do ranking,
+          mas só viram definitivos no fim do jogo.
+        </p>
+      )}
+
       {ranking.length === 0 ? (
         <p className="rounded-xl border border-navy-700/60 bg-navy-800/50 p-6 text-center text-navy-300">
           Nenhum participante ainda. Seja o primeiro a palpitar!
@@ -74,6 +81,11 @@ export function RankingPage({ matches, currentEmail }: RankingPageProps) {
                 <p className="text-right">
                   <span className="text-xl font-black text-brand-500">{entry.totalPoints}</span>
                   <span className="ml-1 text-xs text-navy-300">pts</span>
+                  {entry.livePoints > 0 && (
+                    <span className="block animate-pulse text-[10px] font-bold text-red-300">
+                      +{entry.livePoints} parcial
+                    </span>
+                  )}
                 </p>
               </li>
             )

@@ -35,6 +35,7 @@ interface ApiGame {
   local_date: string // MM/DD/YYYY HH:mm — no fuso local do ESTÁDIO
   stadium_id: string
   finished: string // "TRUE" | "FALSE"
+  time_elapsed: string // notstarted | live | ...
   type: string // group | r32 | r16 | qf | sf | third | final
   home_team_label?: string
   away_team_label?: string
@@ -156,6 +157,12 @@ function toRealScore(game: ApiGame): Score | null {
   return { home: Number(game.home_score), away: Number(game.away_score) }
 }
 
+/** Placar parcial: jogo em andamento na API (apuração provisória). */
+function toLiveScore(game: ApiGame): Score | null {
+  if (game.finished === 'TRUE' || game.time_elapsed === 'notstarted') return null
+  return { home: Number(game.home_score), away: Number(game.away_score) }
+}
+
 function mapToMatches(games: ApiGame[], teams: ApiTeam[]): Match[] {
   const teamById = new Map(teams.map((t) => [t.id, t]))
   return games.map((game) => ({
@@ -166,6 +173,7 @@ function mapToMatches(games: ApiGame[], teams: ApiTeam[]): Match[] {
     homeTeam: toTeam(teamById.get(game.home_team_id), game.home_team_label),
     awayTeam: toTeam(teamById.get(game.away_team_id), game.away_team_label),
     realScore: toRealScore(game),
+    liveScore: toLiveScore(game),
   }))
 }
 

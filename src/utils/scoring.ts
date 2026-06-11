@@ -70,8 +70,22 @@ export function calculateUserScore(user: User, matches: Match[]): UserScore {
 }
 
 /**
- * Monta o leaderboard: ordena por pontos, com desempate por número de
- * placares exatos e, por fim, ordem alfabética do nome.
+ * Apuração parcial: pontos provisórios contra o placar atual dos jogos
+ * em andamento. Flutuam a cada gol e só viram definitivos no apito final.
+ */
+export function calculateLivePoints(user: User, matches: Match[]): number {
+  let total = 0
+  for (const match of matches) {
+    const prediction = user.predictions[match.id]
+    if (match.realScore || !match.liveScore || !prediction) continue
+    total += calculateMatchPoints(prediction, match.liveScore)
+  }
+  return total
+}
+
+/**
+ * Monta o leaderboard: ordena por pontos (definitivos + parciais ao vivo),
+ * com desempate por placares exatos e, por fim, ordem alfabética do nome.
  */
 export function buildRanking(users: User[], matches: Match[]): RankingEntry[] {
   return users
@@ -82,13 +96,14 @@ export function buildRanking(users: User[], matches: Match[]): RankingEntry[] {
         name: user.name,
         company: user.company,
         totalPoints: score.totalPoints,
+        livePoints: calculateLivePoints(user, matches),
         exactScores: score.exactScores,
         predictionsCount: Object.keys(user.predictions).length,
       }
     })
     .sort(
       (a, b) =>
-        b.totalPoints - a.totalPoints ||
+        b.totalPoints + b.livePoints - (a.totalPoints + a.livePoints) ||
         b.exactScores - a.exactScores ||
         a.name.localeCompare(b.name, 'pt-BR'),
     )

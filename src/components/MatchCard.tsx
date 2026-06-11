@@ -38,6 +38,10 @@ export function MatchCard({ match, draft, onChange, locked = false, badge }: Mat
           <span className="ml-2 rounded bg-brand-500/15 px-1.5 py-0.5 font-semibold text-brand-300 uppercase">
             Encerrado {match.realScore.home} x {match.realScore.away}
           </span>
+        ) : match.liveScore ? (
+          <span className="ml-2 animate-pulse rounded bg-red-500/15 px-1.5 py-0.5 font-semibold text-red-300 uppercase">
+            ● Ao vivo {match.liveScore.home} x {match.liveScore.away}
+          </span>
         ) : (
           hasStarted(match) && (
             <span className="ml-2 animate-pulse rounded bg-red-500/15 px-1.5 py-0.5 font-semibold text-red-300 uppercase">

@@ -4,7 +4,7 @@ import { MatchCard } from '../components/MatchCard'
 import type { ScoreDraft } from '../components/MatchCard'
 import { ScoringRulesButton } from '../components/ScoringRules'
 import { db } from '../services/storage'
-import { calculateMatchPoints, calculateUserScore } from '../utils/scoring'
+import { calculateLivePoints, calculateMatchPoints, calculateUserScore } from '../utils/scoring'
 import { groupMatchesBySection } from '../utils/matches'
 
 interface DashboardPageProps {
@@ -35,6 +35,7 @@ export function DashboardPage({ user, matches, onUserUpdate }: DashboardPageProp
 
   const sections = useMemo(() => groupMatchesBySection(matches), [matches])
   const score = useMemo(() => calculateUserScore(user, matches), [user, matches])
+  const livePoints = useMemo(() => calculateLivePoints(user, matches), [user, matches])
 
   const filledCount = Object.values(drafts).filter((d) => d.home !== '' && d.away !== '').length
 
@@ -68,7 +69,12 @@ export function DashboardPage({ user, matches, onUserUpdate }: DashboardPageProp
     <div className="mx-auto max-w-3xl px-4 pt-4 pb-28">
       {/* Resumo da pontuação do usuário */}
       <div className="mb-3 grid grid-cols-3 gap-3">
-        <StatCard label="Pontos" value={score.totalPoints} accent />
+        <StatCard
+          label="Pontos"
+          value={score.totalPoints}
+          accent
+          sub={livePoints > 0 ? `+${livePoints} parcial` : undefined}
+        />
         <StatCard label="Em cheio" value={score.exactScores} />
         <StatCard label="Palpites" value={filledCount} />
       </div>
@@ -88,6 +94,11 @@ export function DashboardPage({ user, matches, onUserUpdate }: DashboardPageProp
               const saved = user.predictions[match.id]
               const points =
                 match.realScore && saved ? calculateMatchPoints(saved, match.realScore) : null
+              // apuração parcial: pontos provisórios contra o placar ao vivo
+              const livePts =
+                !match.realScore && match.liveScore && saved
+                  ? calculateMatchPoints(saved, match.liveScore)
+                  : null
               return (
                 <MatchCard
                   key={match.id}
@@ -96,7 +107,7 @@ export function DashboardPage({ user, matches, onUserUpdate }: DashboardPageProp
                   onChange={updateDraft(match.id)}
                   locked={match.realScore !== null}
                   badge={
-                    points !== null && (
+                    points !== null ? (
                       <span
                         className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
                           points > 0
@@ -106,6 +117,12 @@ export function DashboardPage({ user, matches, onUserUpdate }: DashboardPageProp
                       >
                         {points > 0 ? `+${points} pts` : '0 pts'}
                       </span>
+                    ) : (
+                      livePts !== null && (
+                        <span className="animate-pulse rounded-full bg-red-500/10 px-2.5 py-0.5 text-xs font-bold text-red-300">
+                          parcial: {livePts > 0 ? `+${livePts}` : '0'} pts
+                        </span>
+                      )
                     )
                   }
                 />
@@ -141,10 +158,23 @@ export function DashboardPage({ user, matches, onUserUpdate }: DashboardPageProp
   )
 }
 
-function StatCard({ label, value, accent = false }: { label: string; value: number; accent?: boolean }) {
+function StatCard({
+  label,
+  value,
+  accent = false,
+  sub,
+}: {
+  label: string
+  value: number
+  accent?: boolean
+  sub?: string
+}) {
   return (
     <div className="rounded-xl border border-navy-700/60 bg-navy-800/50 p-3 text-center">
-      <p className={`text-2xl font-black ${accent ? 'text-brand-500' : 'text-white'}`}>{value}</p>
+      <p className={`text-2xl font-black ${accent ? 'text-brand-500' : 'text-white'}`}>
+        {value}
+        {sub && <span className="ml-1 align-middle text-[10px] font-bold text-red-300">{sub}</span>}
+      </p>
       <p className="text-xs font-medium text-navy-300 uppercase">{label}</p>
     </div>
   )
