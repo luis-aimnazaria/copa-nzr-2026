@@ -40,6 +40,19 @@ alter table public.users enable row level security;
 alter table public.predictions enable row level security;
 alter table public.results enable row level security;
 
+-- drop antes de criar: torna o script seguro de rodar mais de uma vez
+drop policy if exists "users_select" on public.users;
+drop policy if exists "users_insert" on public.users;
+drop policy if exists "users_update" on public.users;
+drop policy if exists "predictions_select" on public.predictions;
+drop policy if exists "predictions_insert" on public.predictions;
+drop policy if exists "predictions_update" on public.predictions;
+drop policy if exists "predictions_delete" on public.predictions;
+drop policy if exists "results_select" on public.results;
+drop policy if exists "results_insert" on public.results;
+drop policy if exists "results_update" on public.results;
+drop policy if exists "results_delete" on public.results;
+
 create policy "users_select" on public.users for select using (true);
 create policy "users_insert" on public.users for insert with check (true);
 create policy "users_update" on public.users for update using (true);

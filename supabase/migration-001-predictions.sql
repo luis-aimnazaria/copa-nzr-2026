@@ -17,6 +17,12 @@ create table if not exists public.predictions (
 
 alter table public.predictions enable row level security;
 
+-- drop antes de criar: torna o script seguro de rodar mais de uma vez
+drop policy if exists "predictions_select" on public.predictions;
+drop policy if exists "predictions_insert" on public.predictions;
+drop policy if exists "predictions_update" on public.predictions;
+drop policy if exists "predictions_delete" on public.predictions;
+
 create policy "predictions_select" on public.predictions for select using (true);
 create policy "predictions_insert" on public.predictions for insert with check (true);
 create policy "predictions_update" on public.predictions for update using (true);
