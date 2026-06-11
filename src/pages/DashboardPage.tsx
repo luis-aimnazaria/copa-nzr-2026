@@ -71,9 +71,9 @@ export function DashboardPage({ user, matches, onUserUpdate }: DashboardPageProp
       <div className="mb-3 grid grid-cols-3 gap-3">
         <StatCard
           label="Pontos"
-          value={score.totalPoints}
+          value={score.totalPoints + livePoints}
           accent
-          sub={livePoints > 0 ? `+${livePoints} parcial` : undefined}
+          sub={livePoints > 0 ? `inclui +${livePoints} parcial` : undefined}
         />
         <StatCard label="Em cheio" value={score.exactScores} />
         <StatCard label="Palpites" value={filledCount} />

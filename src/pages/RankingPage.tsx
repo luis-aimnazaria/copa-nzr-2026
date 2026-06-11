@@ -79,11 +79,13 @@ export function RankingPage({ matches, currentEmail }: RankingPageProps) {
                   </p>
                 </div>
                 <p className="text-right">
-                  <span className="text-xl font-black text-brand-500">{entry.totalPoints}</span>
+                  <span className="text-xl font-black text-brand-500">
+                    {entry.totalPoints + entry.livePoints}
+                  </span>
                   <span className="ml-1 text-xs text-navy-300">pts</span>
                   {entry.livePoints > 0 && (
                     <span className="block animate-pulse text-[10px] font-bold text-red-300">
-                      +{entry.livePoints} parcial
+                      inclui +{entry.livePoints} parcial
                     </span>
                   )}
                 </p>
