@@ -33,7 +33,7 @@ Os jogos vêm da [World Cup 2026 API](https://github.com/rezarahiminia/worldcup2
 |---|---|
 | **Entrada** | Digite o e-mail. Cadastrado → carrega os palpites; novo → pede o nome e cria o perfil. |
 | **Palpites** | Jogos separados por grupo/fase com inputs de placar e botão "Salvar Palpites". Jogos apurados ficam bloqueados e mostram os pontos ganhos. |
-| **Ranking** | Leaderboard ordenado por pontos (desempate: placares em cheio), com e-mail mascarado (`lu***@nazaria.com.br`). |
+| **Ranking** | Leaderboard ordenado por pontos (desempate: placares em cheio), com e-mail mascarado (`lu***@***.com.br`). |
 | **Apuração** | Área administrativa protegida por senha padrão (`nzr2026`, definida em `src/pages/AdminPage.tsx`) para registrar placares manualmente — a pontuação de todos é recalculada automaticamente. |
 
 ## Pontuação (`src/utils/scoring.ts`)

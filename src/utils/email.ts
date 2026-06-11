@@ -13,10 +13,13 @@ export function isValidEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(normalizeEmail(value))
 }
 
-/** Máscara de privacidade para o leaderboard: lu***@nazaria.com.br. */
+/** Máscara de privacidade para o leaderboard: lu***@***.com.br. */
 export function maskEmail(email: string): string {
   const [local, domain] = email.split('@')
   if (!domain) return email
   const visible = local.slice(0, Math.min(2, local.length))
-  return `${visible}***@${domain}`
+  // censura também o primeiro rótulo do domínio (lu***@***.com.br)
+  const [, ...domainRest] = domain.split('.')
+  const maskedDomain = domainRest.length ? `***.${domainRest.join('.')}` : '***'
+  return `${visible}***@${maskedDomain}`
 }
