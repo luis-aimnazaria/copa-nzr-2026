@@ -32,12 +32,39 @@ interface ApiGame {
   home_score: string
   away_score: string
   group: string
-  local_date: string // MM/DD/YYYY HH:mm
+  local_date: string // MM/DD/YYYY HH:mm — no fuso local do ESTÁDIO
+  stadium_id: string
   finished: string // "TRUE" | "FALSE"
   type: string // group | r32 | r16 | qf | sf | third | final
   home_team_label?: string
   away_team_label?: string
 }
+
+/**
+ * Fuso IANA de cada estádio (id da API → timezone). A API envia o horário
+ * na hora local do estádio; convertemos para UTC e o navegador exibe no
+ * fuso de quem está vendo (ex.: 13:00 no Azteca → 16:00 em Brasília).
+ */
+const STADIUM_TIMEZONES: Record<string, string> = {
+  '1': 'America/Mexico_City', // Estadio Azteca — Cidade do México
+  '2': 'America/Mexico_City', // Estadio Akron — Guadalajara
+  '3': 'America/Monterrey', // Estadio BBVA — Monterrey
+  '4': 'America/Chicago', // AT&T Stadium — Dallas
+  '5': 'America/Chicago', // NRG Stadium — Houston
+  '6': 'America/Chicago', // Arrowhead — Kansas City
+  '7': 'America/New_York', // Mercedes-Benz — Atlanta
+  '8': 'America/New_York', // Hard Rock — Miami
+  '9': 'America/New_York', // Gillette — Boston
+  '10': 'America/New_York', // Lincoln Financial — Philadelphia
+  '11': 'America/New_York', // MetLife — Nova York/Nova Jersey
+  '12': 'America/Toronto', // BMO Field — Toronto
+  '13': 'America/Vancouver', // BC Place — Vancouver
+  '14': 'America/Los_Angeles', // Lumen Field — Seattle
+  '15': 'America/Los_Angeles', // Levi's — São Francisco
+  '16': 'America/Los_Angeles', // SoFi — Los Angeles
+}
+
+const DEFAULT_TIMEZONE = 'America/New_York'
 
 const PHASE_BY_TYPE: Record<string, Phase> = {
   group: 'GROUP',
@@ -88,12 +115,40 @@ function toTeam(apiTeam: ApiTeam | undefined, label: string | undefined): Team {
   }
 }
 
-/** "06/11/2026 13:00" (MM/DD/YYYY, horário local) → ISO 8601. */
-function parseApiDate(localDate: string): string {
+/** Diferença (ms) entre o relógio de parede do fuso dado e o UTC, num instante. */
+function tzOffsetMs(epochMs: number, timeZone: string): number {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    hour12: false,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).formatToParts(new Date(epochMs))
+  const get = (type: string) => Number(parts.find((p) => p.type === type)?.value)
+  const asUtc = Date.UTC(
+    get('year'),
+    get('month') - 1,
+    get('day'),
+    get('hour') % 24,
+    get('minute'),
+    get('second'),
+  )
+  return asUtc - epochMs
+}
+
+/** "06/11/2026 13:00" (MM/DD/YYYY, hora local do estádio) → ISO 8601 em UTC. */
+function parseApiDate(localDate: string, timeZone: string): string {
   const [date, time] = localDate.split(' ')
   const [month, day, year] = date.split('/').map(Number)
   const [hour, minute] = time.split(':').map(Number)
-  return new Date(year, month - 1, day, hour, minute).toISOString()
+  const wallUtc = Date.UTC(year, month - 1, day, hour, minute)
+  // duas passadas para estabilizar em viradas de horário de verão
+  let offset = tzOffsetMs(wallUtc, timeZone)
+  offset = tzOffsetMs(wallUtc - offset, timeZone)
+  return new Date(wallUtc - offset).toISOString()
 }
 
 function toRealScore(game: ApiGame): Score | null {
@@ -105,7 +160,7 @@ function mapToMatches(games: ApiGame[], teams: ApiTeam[]): Match[] {
   const teamById = new Map(teams.map((t) => [t.id, t]))
   return games.map((game) => ({
     id: game.id,
-    date: parseApiDate(game.local_date),
+    date: parseApiDate(game.local_date, STADIUM_TIMEZONES[game.stadium_id] ?? DEFAULT_TIMEZONE),
     phase: PHASE_BY_TYPE[game.type] ?? 'GROUP',
     group: game.type === 'group' ? game.group : undefined,
     homeTeam: toTeam(teamById.get(game.home_team_id), game.home_team_label),
