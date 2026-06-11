@@ -58,3 +58,5 @@ create trigger predictions_lock
 --    A coluna JSONB legada deixa de ser usada; mantê-la durante a
 --    transição evita quebrar quem ainda estiver com o site antigo aberto.
 -- alter table public.users drop column if exists predictions;
+
+alter table public.users drop column if exists predictions;

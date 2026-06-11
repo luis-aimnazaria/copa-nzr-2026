@@ -177,7 +177,7 @@ function mapToMatches(games: ApiGame[], teams: ApiTeam[]): Match[] {
   }))
 }
 
-/* ---------- Fetch com timeout + fallback ---------- */
+/* ---------- Fetch com timeout, retry e fallback em camadas ---------- */
 
 async function fetchJson<T>(path: string): Promise<T> {
   const controller = new AbortController()
@@ -191,21 +191,69 @@ async function fetchJson<T>(path: string): Promise<T> {
   }
 }
 
+/** Última resposta boa da API, guardada no navegador (sobrevive a falhas temporárias). */
+const CACHE_KEY = 'bolao2026:apiCache'
+
+interface ApiCache {
+  games: ApiGame[]
+  teams: ApiTeam[]
+  savedAt: string
+}
+
+function readCache(): ApiCache | null {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY)
+    return raw ? (JSON.parse(raw) as ApiCache) : null
+  } catch {
+    return null
+  }
+}
+
+function writeCache(games: ApiGame[], teams: ApiTeam[]): void {
+  try {
+    localStorage.setItem(
+      CACHE_KEY,
+      JSON.stringify({ games, teams, savedAt: new Date().toISOString() } satisfies ApiCache),
+    )
+  } catch {
+    // storage cheio/indisponível: cache é só otimização, segue sem ele
+  }
+}
+
+async function fetchFromApi(): Promise<{ games: ApiGame[]; teams: ApiTeam[] }> {
+  const [gamesRes, teamsRes] = await Promise.all([
+    fetchJson<{ games: ApiGame[] }>('/get/games'),
+    fetchJson<{ teams: ApiTeam[] }>('/get/teams'),
+  ])
+  return { games: gamesRes.games, teams: teamsRes.teams }
+}
+
 /**
- * Busca o calendário completo. API ao vivo primeiro; snapshot local como fallback.
+ * Busca o calendário completo, em camadas de resiliência:
+ *  1. API ao vivo (com uma re-tentativa — o servidor oscila em dias de jogo);
+ *  2. última resposta boa guardada no navegador (mantém placares recentes);
+ *  3. snapshot estático empacotado no app (último recurso).
  */
 export async function fetchMatches(): Promise<Match[]> {
-  try {
-    const [gamesRes, teamsRes] = await Promise.all([
-      fetchJson<{ games: ApiGame[] }>('/get/games'),
-      fetchJson<{ teams: ApiTeam[] }>('/get/teams'),
-    ])
-    return mapToMatches(gamesRes.games, teamsRes.teams)
-  } catch (error) {
-    console.warn('[fifaApi] API ao vivo indisponível, usando snapshot local.', error)
-    return mapToMatches(
-      gamesSnapshot as unknown as ApiGame[],
-      teamsSnapshot as unknown as ApiTeam[],
-    )
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      const { games, teams } = await fetchFromApi()
+      writeCache(games, teams)
+      return mapToMatches(games, teams)
+    } catch (error) {
+      console.warn(`[fifaApi] tentativa ${attempt} falhou.`, error)
+    }
   }
+
+  const cached = readCache()
+  if (cached) {
+    console.warn(`[fifaApi] API indisponível — usando última resposta boa (${cached.savedAt}).`)
+    return mapToMatches(cached.games, cached.teams)
+  }
+
+  console.warn('[fifaApi] API indisponível e sem cache — usando snapshot local.')
+  return mapToMatches(
+    gamesSnapshot as unknown as ApiGame[],
+    teamsSnapshot as unknown as ApiTeam[],
+  )
 }
